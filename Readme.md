@@ -1,7 +1,7 @@
 # Проект «Киноман»
 
 * Студент: [Анна Самусева](https://up.htmlacademy.ru/ecmascript/15/user/1309327).
-* Наставник: [Сергей Рожков] (https://htmlacademy.ru//profile/id1069033).
+* Наставник: [Сергей Рожков](https://htmlacademy.ru//profile/id1069033).
 
 ---
 
