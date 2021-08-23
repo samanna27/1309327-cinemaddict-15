@@ -53,8 +53,3 @@ export const generateComment = () => {
     text: getRandomArrayElements(commentsText, EMOJI_AUTHOR_COUNT),
   };
 };
-
-// export const comments = [
-//   {},
-//   {},
-// ];

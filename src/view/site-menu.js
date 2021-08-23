@@ -22,13 +22,5 @@ const createSiteMenuTemplate = (filtersAndStats) => {
   );
 };
 
-const createStatsTemplate = (filtersAndStats) => {
-  const {count} = filtersAndStats;
-
-  return (
-    `<p>${count} movies inside</p>`
-  );
-};
-
-export {createSiteMenuTemplate, createStatsTemplate};
+export {createSiteMenuTemplate};
 
