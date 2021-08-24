@@ -1,11 +1,26 @@
-export const createSiteMenuTemplate = () => (
-  `<nav class="main-navigation">
-  <div class="main-navigation__items">
-    <a href="#all" class="main-navigation__item main-navigation__item--active">All movies</a>
-    <a href="#watchlist" class="main-navigation__item">Watchlist <span class="main-navigation__item-count">0</span></a>
-    <a href="#history" class="main-navigation__item">History <span class="main-navigation__item-count">0</span></a>
-    <a href="#favorites" class="main-navigation__item">Favorites <span class="main-navigation__item-count">0</span></a>
-  </div>
-  <a href="#stats" class="main-navigation__additional">Stats</a>
-</nav>`
-);
+const createSiteMenuItemTemplate = (filtersAndStats) => {
+  const {name, count} = filtersAndStats;
+
+  return (
+    `<a href="#${name}" class="main-navigation__item"
+    ${count === 0 ? 'disabled' : ''}
+    >${name.toString()[0].toUpperCase()+name.toString().slice(1)} <span class="main-navigation__item-count">${count}</span></a>`
+  );
+};
+
+const createSiteMenuTemplate = (filtersAndStats) => {
+  const filterItemsTemplate = filtersAndStats.map((filter, index) => createSiteMenuItemTemplate(filter, index === 0)).slice(1).join('');
+
+  return(
+    `<a href="#All" class="main-navigation__item"
+    ${filtersAndStats[0].count === 0 ? 'disabled' : ''}
+    >All movies</a>
+    ${filterItemsTemplate}
+    </div>
+    <a href="#stats" class="main-navigation__additional">Stats</a>
+    </nav>`
+  );
+};
+
+export {createSiteMenuTemplate};
+
