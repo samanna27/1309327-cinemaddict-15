@@ -1,20 +1,8 @@
-export const createFilmPopupTemplate = (film = {}) => {
-  const {
-    title = '',
-    originalTitle = '',
-    poster = null,
-    fullDescription = [],
-    rating = 0,
-    director = [],
-    writers = [],
-    actors = [],
-    releaseDate ='',
-    duration = '',
-    country = [],
-    isAddedToWatchlist = false,
-    isAlreadyWatched = false,
-    isFavorite = false,
-  } = film;
+import { createElement } from '../utils';
+import { BLANK_FILM } from '../const';
+
+const createFilmPopupTemplate = (film) => {
+  const {title, originalTitle, poster, fullDescription, rating, director, writers, actors, releaseDate, duration, country, isAddedToWatchlist, isAlreadyWatched, isFavorite } = film;
 
   const addedToWatchlistClassName = isAddedToWatchlist
     ? 'film-details__control-button--active '
@@ -98,3 +86,26 @@ export const createFilmPopupTemplate = (film = {}) => {
   </form>
 </section>`;
 };
+
+export default class FilmPopup {
+  constructor(film = BLANK_FILM){
+    this._film = film;
+    this._element=null;
+  }
+
+  getTemplate() {
+    return createFilmPopupTemplate(this._film);
+  }
+
+  getElement() {
+    if(!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement(){
+    this._element = null;
+  }
+}

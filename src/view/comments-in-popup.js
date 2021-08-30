@@ -1,10 +1,9 @@
 import { generateComment } from '../mock/comments';
+import { createElement } from '../utils';
+import { BLANK_COMMENT } from '../const';
 
-
-export const createCommentTemplate = (film = {}) => {
-  const {
-    comments = [],
-  } = film;
+const createCommentTemplate = (film) => {
+  const { comments } = film;
   const commentsArray = new Array(comments.length).fill().map(generateComment);
 
   const popupCommentsTemplate = [];
@@ -63,4 +62,25 @@ export const createCommentTemplate = (film = {}) => {
       </section>`;
 };
 
+export default class CommentInPopup {
+  constructor(comment = BLANK_COMMENT){
+    this._comment = comment;
+    this._element=null;
+  }
 
+  getTemplate() {
+    return createCommentTemplate(this._comment);
+  }
+
+  getElement() {
+    if(!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement(){
+    this._element = null;
+  }
+}
