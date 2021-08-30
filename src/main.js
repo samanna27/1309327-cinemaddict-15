@@ -51,14 +51,14 @@ const renderFilm = (Place, film) => {
   const replaceFilmCardToPopup = () => {
     replace(filmPopupComponent, filmComponent);
 
-    document.querySelector('body').classList.add('hide-overflow');
-    document.addEventListener('keydown', onPopupEscKeydown);
-
     const genreInPopupContainterElement = document.querySelector('.film-details__table');
     render(genreInPopupContainterElement, filmPopupGenreComponent, RenderPosition.BEFOREEND);
 
     const commentsInPopupContainterElement = document.querySelector('.film-details__bottom-container');
     render(commentsInPopupContainterElement, commentInPopupComponent, RenderPosition.BEFOREEND);
+
+    document.querySelector('body').classList.add('hide-overflow');
+    document.addEventListener('keydown', onPopupEscKeydown);
   };
 
   filmComponent.setClickHandler(() => {replaceFilmCardToPopup();});
