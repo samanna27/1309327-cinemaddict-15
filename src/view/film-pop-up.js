@@ -1,4 +1,4 @@
-import { createElement } from '../utils';
+import AbstractView from './abstract';
 import { BLANK_FILM } from '../const';
 
 const createFilmPopupTemplate = (film) => {
@@ -87,25 +87,25 @@ const createFilmPopupTemplate = (film) => {
 </section>`;
 };
 
-export default class FilmPopup {
+export default class FilmPopup extends AbstractView{
   constructor(film = BLANK_FILM){
+    super();
     this._film = film;
-    this._element=null;
+
+    this._popupClsButtonClickHandler = this._popupClsButtonClickHandler.bind(this);
   }
 
   getTemplate() {
     return createFilmPopupTemplate(this._film);
   }
 
-  getElement() {
-    if(!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+  _popupClsButtonClickHandler(evt) {
+    evt.preventDefault();
+    this._callback_popupClsButtonClick();
   }
 
-  removeElement(){
-    this._element = null;
+  setPopupClsButtonClickHandler(callback) {
+    this._callback_popupClsButtonClick = callback;
+    this.getElement().querySelector('.film-details__close-btn').addEventListener('click', this._popupClsButtonClickHandler);
   }
 }

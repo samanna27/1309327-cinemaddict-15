@@ -1,4 +1,4 @@
-import { createElement } from '../utils';
+import AbstractView from './abstract';
 import { BLANK_GENRE } from '../const';
 
 const createPopupGenreTemplate = (film) => {
@@ -22,25 +22,13 @@ const createPopupGenreTemplate = (film) => {
   </section>`;
 };
 
-export default class FilmPopupGenre {
+export default class FilmPopupGenre extends AbstractView {
   constructor(genre = BLANK_GENRE){
+    super();
     this._genre = genre;
-    this._element=null;
   }
 
   getTemplate() {
     return createPopupGenreTemplate(this._genre);
-  }
-
-  getElement() {
-    if(!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement(){
-    this._element = null;
   }
 }
