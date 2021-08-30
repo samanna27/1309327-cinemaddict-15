@@ -1,4 +1,4 @@
-import AbstractView from './abstract';
+import AbstractView from './abstract.js';
 import { BLANK_FILM } from '../const';
 
 const createFilmPopupTemplate = (film) => {
@@ -101,11 +101,11 @@ export default class FilmPopup extends AbstractView{
 
   _popupClsButtonClickHandler(evt) {
     evt.preventDefault();
-    this._callback_popupClsButtonClick();
+    this._callback.popupClsButtonClick();
   }
 
   setPopupClsButtonClickHandler(callback) {
-    this._callback_popupClsButtonClick = callback;
+    this._callback.popupClsButtonClick = callback;
     this.getElement().querySelector('.film-details__close-btn').addEventListener('click', this._popupClsButtonClickHandler);
   }
 }

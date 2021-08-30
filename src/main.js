@@ -31,6 +31,8 @@ render(siteMainElement, new SiteMenuView(filters), RenderPosition.BEFOREEND);
 const renderFilm = (Place, film) => {
   const filmComponent = new FilmView(film);
   const filmPopupComponent = new FilmPopupView(film);
+  const filmPopupGenreComponent = new FilmPopupGenreView(films[0]);
+  const commentInPopupComponent = new CommentInPopupView(films[0]);
 
   const replacePopupToFilmCard = () => {
     replace(filmComponent, filmPopupComponent);
@@ -42,20 +44,21 @@ const renderFilm = (Place, film) => {
       replacePopupToFilmCard();
       document.querySelector('body').classList.remove('hide-overflow');
       document.removeEventListener('keydown', onPopupEscKeydown);
+      remove(filmPopupGenreComponent);
     }
   };
 
   const replaceFilmCardToPopup = () => {
     replace(filmPopupComponent, filmComponent);
 
-    const genreInPopupContainterElement = document.querySelector('.film-details__table');
-    render(genreInPopupContainterElement, new FilmPopupGenreView(films[0]), RenderPosition.BEFOREEND);
-
-    const commentsInPopupContainterElement = document.querySelector('.film-details__bottom-container');
-    render(commentsInPopupContainterElement, new CommentInPopupView(films[0]), RenderPosition.BEFOREEND);
-
     document.querySelector('body').classList.add('hide-overflow');
     document.addEventListener('keydown', onPopupEscKeydown);
+
+    const genreInPopupContainterElement = document.querySelector('.film-details__table');
+    render(genreInPopupContainterElement, filmPopupGenreComponent, RenderPosition.BEFOREEND);
+
+    const commentsInPopupContainterElement = document.querySelector('.film-details__bottom-container');
+    render(commentsInPopupContainterElement, commentInPopupComponent, RenderPosition.BEFOREEND);
   };
 
   filmComponent.setClickHandler(() => {replaceFilmCardToPopup();});
