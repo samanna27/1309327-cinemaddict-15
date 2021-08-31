@@ -17,7 +17,13 @@ const BLANK_FILM = {
   isAlreadyWatched: false,
   isFavorite: false,
 };
-const BLANK_COMMENT = [];
+const BLANK_COMMENT = {
+  id: 0,
+  emoji: '',
+  date: '',
+  author: '',
+  text: '',
+};
 const BLANK_GENRE = [];
 
 export {FILM_CARD_COUNT_PER_STEP, FILM_CARD_MOCK_COUNT, TOP_COMMENTED_FILM_CARD_COUNT, BLANK_FILM, BLANK_COMMENT, BLANK_GENRE};

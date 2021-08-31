@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { getRandomInteger } from '../utils.js';
+import { getRandomInteger } from '../utils/common.js';
 
 const SENTENCE_COUNT = 5;
 const RATING_MIN=0;

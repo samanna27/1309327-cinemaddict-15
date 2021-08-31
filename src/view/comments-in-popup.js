@@ -1,5 +1,5 @@
 import { generateComment } from '../mock/comments';
-import { createElement } from '../utils';
+import AbstractView from './abstract';
 import { BLANK_COMMENT } from '../const';
 
 const createCommentTemplate = (film) => {
@@ -62,25 +62,13 @@ const createCommentTemplate = (film) => {
       </section>`;
 };
 
-export default class CommentInPopup {
+export default class CommentInPopup extends AbstractView{
   constructor(comment = BLANK_COMMENT){
+    super();
     this._comment = comment;
-    this._element=null;
   }
 
   getTemplate() {
     return createCommentTemplate(this._comment);
-  }
-
-  getElement() {
-    if(!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement(){
-    this._element = null;
   }
 }

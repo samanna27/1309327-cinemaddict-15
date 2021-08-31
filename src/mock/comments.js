@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { getRandomInteger } from '../utils.js';
+import { getRandomInteger } from '../utils/common.js';
 
 let id = 0;
 const EMOJI_AUTHOR_COUNT = 1;
