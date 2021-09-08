@@ -4,21 +4,18 @@ import FilmsContainterView from '../view/films-container';
 import FilmsListContainerView from '../view/films-list';
 import ShowMoreButtonView from '../view/show-more-button';
 import NoFilmsView from '../view/no-films-message';
-// import FilmView from '../view/film-card';
-// import FilmPopupView from '../view/film-pop-up';
-// import CommentInPopupView from '../view/comments-in-popup';
-// import FilmPopupGenreView from '../view/film-genre';
 import TopFilmsView from '../view/top-rated-films';
 import MostCommentedFilmsView from '../view/most-commented-films';
 import FilmPresenter from './film.js';
-// import { isEscEvent } from '../utils/common.js';
 import {render, RenderPosition, remove} from '../utils/render.js';
+import {updateItem} from '../utils/common.js';
 import { FILM_CARD_COUNT_PER_STEP,  TOP_COMMENTED_FILM_CARD_COUNT } from '../const.js';
 
 export default class Board {
   constructor(boardContainer) {
     this._boardContainer = boardContainer;
     this._renderedFilmCount = FILM_CARD_COUNT_PER_STEP;
+    this._filmPresenter = new Map();
 
     this._boardComponent = new BoardContainerView();
     this._sortComponent = new SortingView();
@@ -31,6 +28,8 @@ export default class Board {
     this._mostCommentedFilmsComponent = new MostCommentedFilmsView();
     this._showMoreButtonComponent = new ShowMoreButtonView();
 
+    this._handleFilmChange = this._handleFilmChange.bind(this);
+    this._handleModeChange = this._handleModeChange.bind(this);
     this._handleShowMoreButtonClick = this._handleShowMoreButtonClick.bind(this);
   }
 
@@ -43,55 +42,23 @@ export default class Board {
     this._renderBoard();
   }
 
+  _handleModeChange() {
+    this._filmPresenter.forEach((presenter) => presenter.resetView());
+  }
+
+  _handleFilmChange(updatedFilm) {
+    this._boardFilms = updateItem(this._boardFilms, updatedFilm);
+    this._filmPresenter.get(updatedFilm.id).init(updatedFilm);
+  }
+
   _renderSort() {
     render(this._boardComponent, this._sortComponent, RenderPosition.BEFOREBEGIN);
   }
 
   _renderFilm(film, place) {
-    // const filmComponent = new FilmView(film);
-    // const filmPopupComponent = new FilmPopupView(film);
-    // const filmPopupGenreComponent = new FilmPopupGenreView(film);
-    // const commentInPopupComponent = new CommentInPopupView(film);
-
-    // const replacePopupToFilmCard = () => {
-    //   replace(filmComponent, filmPopupComponent);
-    // };
-
-    // const onPopupEscKeydown = (evt) => {
-    //   if (isEscEvent(evt)) {
-    //     evt.preventDefault();
-    //     replacePopupToFilmCard();
-    //     document.querySelector('body').classList.remove('hide-overflow');
-    //     document.removeEventListener('keydown', onPopupEscKeydown);
-    //     remove(filmPopupGenreComponent);
-    //   }
-    // };
-
-    // const replaceFilmCardToPopup = () => {
-    //   replace(filmPopupComponent, filmComponent);
-
-    //   const genreInPopupContainterElement = document.querySelector('.film-details__table');
-    //   render(genreInPopupContainterElement, filmPopupGenreComponent, RenderPosition.BEFOREEND);
-
-    //   const commentsInPopupContainterElement = document.querySelector('.film-details__bottom-container');
-    //   render(commentsInPopupContainterElement, commentInPopupComponent, RenderPosition.BEFOREEND);
-
-    //   document.querySelector('body').classList.add('hide-overflow');
-    //   document.addEventListener('keydown', onPopupEscKeydown);
-    // };
-
-    // filmComponent.setClickHandler(() => {replaceFilmCardToPopup();});
-
-    // filmPopupComponent.setPopupClsButtonClickHandler(() => {
-    //   replacePopupToFilmCard();
-    //   document.querySelector('body').classList.remove('hide-overflow');
-    //   document.removeEventListener('keydown', onPopupEscKeydown);
-    // });
-
-    // render(place, filmComponent, RenderPosition.BEFOREEND);
-    // const filmPresenter = new FilmPresenter(this._filmsListComponent, film);
-    const filmPresenter = new FilmPresenter(place, film);
+    const filmPresenter = new FilmPresenter(place, film, this._handleFilmChange, this._handleModeChange);
     filmPresenter.init(film);
+    this._filmPresenter.set(film.id, filmPresenter);
   }
 
   _renderFilms(from, to, place) {
@@ -118,6 +85,13 @@ export default class Board {
     render(this._filmsContainerComponent, this._showMoreButtonComponent, RenderPosition.BEFOREEND);
 
     this._showMoreButtonComponent.setClickHandler(this._handleShowMoreButtonClick);
+  }
+
+  _clearFilmList() {
+    this._filmPresenter.forEach((presenter) => presenter.destroy());
+    this._filmPresenter.clear();
+    this._renderedFilmCount = FILM_CARD_COUNT_PER_STEP;
+    remove(this._showMoreButtonComponent);
   }
 
   _renderFilmList(place){
