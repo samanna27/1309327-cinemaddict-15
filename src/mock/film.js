@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import {nanoid} from 'nanoid';
 import { getRandomInteger } from '../utils/common.js';
 
 const SENTENCE_COUNT = 5;
@@ -107,6 +108,7 @@ export const generateFilm = () => {
   const date = generateDate();
 
   return {
+    id: nanoid(),
     title: generateTitle(),
     originalTitle: generateTitle(),
     poster: generatePoster(),

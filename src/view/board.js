@@ -6,7 +6,7 @@ const createBoardTemplate = () => (
 );
 
 
-export default class BoardContainter extends AbstractView {
+export default class BoardContainer extends AbstractView {
   getTemplate() {
     return createBoardTemplate();
   }
