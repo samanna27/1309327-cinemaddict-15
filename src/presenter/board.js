@@ -9,13 +9,15 @@ import MostCommentedFilmsView from '../view/most-commented-films';
 import FilmPresenter from './film.js';
 import {render, RenderPosition, remove} from '../utils/render.js';
 import {updateItem} from '../utils/common.js';
-import { FILM_CARD_COUNT_PER_STEP,  TOP_COMMENTED_FILM_CARD_COUNT } from '../const.js';
+import {sortFilmDateDown, sortFilmRatingDown} from '../utils/task.js';
+import { FILM_CARD_COUNT_PER_STEP,  TOP_COMMENTED_FILM_CARD_COUNT, SortType } from '../const.js';
 
 export default class Board {
   constructor(boardContainer) {
     this._boardContainer = boardContainer;
     this._renderedFilmCount = FILM_CARD_COUNT_PER_STEP;
     this._filmPresenter = new Map();
+    this._currentSortType = SortType.DEFAULT;
 
     this._boardComponent = new BoardContainerView();
     this._sortComponent = new SortingView();
@@ -31,10 +33,13 @@ export default class Board {
     this._handleFilmChange = this._handleFilmChange.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleShowMoreButtonClick = this._handleShowMoreButtonClick.bind(this);
+    this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
   }
 
   init(boardFilms) {
     this._boardFilms = boardFilms.slice();
+    this._sourcedBoardFilms = boardFilms.slice();
+
     render(this._boardContainer, this._boardComponent, RenderPosition.BEFOREEND);
     render(this._boardComponent, this._filmsContainerComponent, RenderPosition.BEFOREEND);
     render(this._filmsContainerComponent, this._filmsListComponent, RenderPosition.BEFOREEND);
@@ -48,11 +53,38 @@ export default class Board {
 
   _handleFilmChange(updatedFilm) {
     this._boardFilms = updateItem(this._boardFilms, updatedFilm);
+    this._sourcedBoardFilms = updateItem(this._sourcedBoardFilms, updatedFilm);
     this._filmPresenter.get(updatedFilm.id).init(updatedFilm);
+  }
+
+  _sortFilms(sortType) {
+    switch (sortType) {
+      case SortType.DATE_DOWN:
+        this._boardFilms.sort(sortFilmDateDown);
+        break;
+      case SortType.RATING_DOWN:
+        this._boardFilms.sort(sortFilmRatingDown);
+        break;
+      default:
+        this._boardFilms = this._sourcedBoardFilms.slice();
+    }
+
+    this._currentSortType = sortType;
+  }
+
+  _handleSortTypeChange(sortType) {
+    if (this._currentSortType === sortType) {
+      return;
+    }
+
+    this._sortFilms(sortType);
+    this._clearFilmList();
+    this._renderFilmList(this._filmsListComponent);
   }
 
   _renderSort() {
     render(this._boardComponent, this._sortComponent, RenderPosition.BEFOREBEGIN);
+    this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
   }
 
   _renderFilm(film, place) {
