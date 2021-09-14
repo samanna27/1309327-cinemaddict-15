@@ -54,7 +54,9 @@ export default class Board {
   _handleFilmChange(updatedFilm) {
     this._boardFilms = updateItem(this._boardFilms, updatedFilm);
     this._sourcedBoardFilms = updateItem(this._sourcedBoardFilms, updatedFilm);
-    this._filmPresenter.get(updatedFilm.id).init(updatedFilm);
+    if(this._filmPresenter.has(updatedFilm.id)){
+      this._filmPresenter.get(updatedFilm.id).init(updatedFilm);
+    }
   }
 
   _sortFilms(sortType) {
@@ -136,13 +138,13 @@ export default class Board {
   _renderTopFilms(){
     render(this._boardComponent, this._topFilmsComponent, RenderPosition.BEFOREEND);
     render(this._topFilmsComponent, this._topFilmsListComponent, RenderPosition.BEFOREEND);
-    this._renderFilms(0,TOP_COMMENTED_FILM_CARD_COUNT, this._topFilmsListComponent);
+    this._renderFilms(0, TOP_COMMENTED_FILM_CARD_COUNT, this._topFilmsListComponent);
   }
 
   _renderMostCommentedFilms(){
     render(this._boardComponent, this._mostCommentedFilmsComponent, RenderPosition.BEFOREEND);
     render(this._mostCommentedFilmsComponent, this._mostCommentedFilmsListComponent, RenderPosition.BEFOREEND);
-    this._renderFilms(0,TOP_COMMENTED_FILM_CARD_COUNT, this._mostCommentedFilmsListComponent);
+    this._renderFilms(0, TOP_COMMENTED_FILM_CARD_COUNT, this._mostCommentedFilmsListComponent);
   }
 
   _renderBoard() {

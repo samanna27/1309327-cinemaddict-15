@@ -144,6 +144,7 @@ export default class Film {
   _escKeyDownHandler(evt) {
     if (isEscEvent(evt)) {
       evt.preventDefault();
+      this._commentInPopupComponent.reset(this._film);
       this._replacePopupToFilmCard();
     }
   }
