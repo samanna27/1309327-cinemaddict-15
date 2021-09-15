@@ -22,7 +22,7 @@ export default class Sorting extends AbstractView {
   }
 
   _sortTypeChangeHandler(evt) {
-    if (evt.target.tagName !== 'A') {
+    if (evt.target.className !== 'sort__button') {
       return;
     }
 

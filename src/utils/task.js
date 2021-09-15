@@ -7,7 +7,7 @@ export const filmToFilterMap = {
   favorites: (films) => films.filter((task) => task.isFavorite).length,
 };
 
-const getWeightForNullDate = (dateA, dateB) => {
+const getWeightRatingDown = (dateA, dateB) => {
   if (dateA === null && dateB === null) {
     return 0;
   }
@@ -24,7 +24,7 @@ const getWeightForNullDate = (dateA, dateB) => {
 };
 
 export const sortFilmDateDown = (filmA, filmB) => {
-  const weight = getWeightForNullDate(filmA.year, filmB.year);
+  const weight = getWeightRatingDown(filmA.year, filmB.year);
 
   if (weight !== null) {
     return weight;
@@ -34,7 +34,7 @@ export const sortFilmDateDown = (filmA, filmB) => {
 };
 
 export const sortFilmRatingDown = (filmA, filmB) => {
-  const weight = getWeightForNullDate(filmA.rating, filmB.rating);
+  const weight = getWeightRatingDown(filmA.rating, filmB.rating);
 
   if (weight !== null) {
     return weight;

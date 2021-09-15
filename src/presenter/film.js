@@ -59,6 +59,7 @@ export default class Film {
 
     if (this._mode === Mode.POPUP) {
       replace(this._filmPopupComponent, prevFilmPopupComponent);
+      this._renderWholePopUp();
     }
 
     remove(prevFilmComponent);
@@ -71,6 +72,14 @@ export default class Film {
 
   }
 
+  _renderWholePopUp (){
+    const genreInPopupContainterElement = document.querySelector('.film-details__table');
+    render(genreInPopupContainterElement, this._filmPopupGenreComponent, RenderPosition.BEFOREEND);
+
+    const commentsInPopupContainterElement = document.querySelector('.film-details__bottom-container');
+    render(commentsInPopupContainterElement, this._commentInPopupComponent, RenderPosition.BEFOREEND);
+  }
+
   resetView() {
     if (this._mode !== Mode.DEFAULT) {
       this._replacePopupToFilmCard();
@@ -79,12 +88,13 @@ export default class Film {
 
   _replaceFilmCardToPopup() {
     replace(this._filmPopupComponent, this._filmComponent);
+    this._renderWholePopUp();
 
-    const genreInPopupContainterElement = document.querySelector('.film-details__table');
-    render(genreInPopupContainterElement, this._filmPopupGenreComponent, RenderPosition.BEFOREEND);
+    // const genreInPopupContainterElement = document.querySelector('.film-details__table');
+    // render(genreInPopupContainterElement, this._filmPopupGenreComponent, RenderPosition.BEFOREEND);
 
-    const commentsInPopupContainterElement = document.querySelector('.film-details__bottom-container');
-    render(commentsInPopupContainterElement, this._commentInPopupComponent, RenderPosition.BEFOREEND);
+    // const commentsInPopupContainterElement = document.querySelector('.film-details__bottom-container');
+    // render(commentsInPopupContainterElement, this._commentInPopupComponent, RenderPosition.BEFOREEND);
 
     document.querySelector('body').classList.add('hide-overflow');
 
@@ -144,7 +154,7 @@ export default class Film {
   _escKeyDownHandler(evt) {
     if (isEscEvent(evt)) {
       evt.preventDefault();
-      this._commentInPopupComponent.reset(this._film);
+      this._commentInPopupComponent._reset(this._film);
       this._replacePopupToFilmCard();
     }
   }

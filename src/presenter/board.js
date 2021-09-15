@@ -17,6 +17,8 @@ export default class Board {
     this._boardContainer = boardContainer;
     this._renderedFilmCount = FILM_CARD_COUNT_PER_STEP;
     this._filmPresenter = new Map();
+    this._topFilmPresenter = new Map();
+    this._commentedFilmPresenter = new Map();
     this._currentSortType = SortType.DEFAULT;
 
     this._boardComponent = new BoardContainerView();
@@ -49,6 +51,8 @@ export default class Board {
 
   _handleModeChange() {
     this._filmPresenter.forEach((presenter) => presenter.resetView());
+    this._topFilmPresenter.forEach((presenter) => presenter.resetView());
+    this._commentedFilmPresenter.forEach((presenter) => presenter.resetView());
   }
 
   _handleFilmChange(updatedFilm) {
@@ -56,6 +60,12 @@ export default class Board {
     this._sourcedBoardFilms = updateItem(this._sourcedBoardFilms, updatedFilm);
     if(this._filmPresenter.has(updatedFilm.id)){
       this._filmPresenter.get(updatedFilm.id).init(updatedFilm);
+    }
+    if(this._topFilmPresenter.has(updatedFilm.id)){
+      this._topFilmPresenter.get(updatedFilm.id).init(updatedFilm);
+    }
+    if(this._commentedFilmPresenter.has(updatedFilm.id)){
+      this._commentedFilmPresenter.get(updatedFilm.id).init(updatedFilm);
     }
   }
 
@@ -90,9 +100,20 @@ export default class Board {
   }
 
   _renderFilm(film, place) {
-    const filmPresenter = new FilmPresenter(place, film, this._handleFilmChange, this._handleModeChange);
-    filmPresenter.init(film);
-    this._filmPresenter.set(film.id, filmPresenter);
+    if(place === this._topFilmsListComponent) {
+      const filmPresenter = new FilmPresenter(place, film, this._handleFilmChange, this._handleModeChange);
+      filmPresenter.init(film);
+      this._topFilmPresenter.set(film.id, filmPresenter);
+    } else if (place === this._mostCommentedFilmsListComponent) {
+      const filmPresenter = new FilmPresenter(place, film, this._handleFilmChange, this._handleModeChange);
+      filmPresenter.init(film);
+      this._commentedFilmPresenter.set(film.id, filmPresenter);
+    } else {
+      // this._filmPresenter.has(film.id)){
+      const filmPresenter = new FilmPresenter(place, film, this._handleFilmChange, this._handleModeChange);
+      filmPresenter.init(film);
+      this._filmPresenter.set(film.id, filmPresenter);
+    }
   }
 
   _renderFilms(from, to, place) {

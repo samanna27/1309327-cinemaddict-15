@@ -1,13 +1,16 @@
 import { generateComment } from '../mock/comments';
 import SmartView from './smart';
 import { BLANK_COMMENT } from '../const';
+import { isEnter } from '../utils/common.js';
+
 
 const createCommentTemplate = (data) => {
   const { comments, isEmoji, popupCommentsTemplate } = data;
   const commentsArray = new Array(comments.length).fill().map(generateComment);
 
   if(data.isComment) {
-    commentsArray.forEach((element)=> popupCommentsTemplate.push(`<li class="film-details__comment">
+    commentsArray.forEach((element)=> {
+      popupCommentsTemplate.push(`<li class="film-details__comment">
           <span class="film-details__comment-emoji">
             <img src="./images/emoji/${element.emoji}.png" width="55" height="55" alt="">
           </span>
@@ -19,7 +22,8 @@ const createCommentTemplate = (data) => {
               <button class="film-details__comment-delete" data-id="${element.id}">Delete</button>
             </p>
           </div>
-        </li>`));
+        </li>`);
+    });
   } else {popupCommentsTemplate.push('');}
 
   return    `<section class="film-details__comments-wrap">
@@ -72,12 +76,14 @@ export default class CommentInPopup extends SmartView{
 
     this._commentDeleteHandler = this._commentDeleteHandler.bind(this);
     this._commentTextInputHandler = this._commentTextInputHandler.bind(this);
+    this._commentSubmitHandler = this._commentSubmitHandler.bind(this);
     this._emojiClickHandler = this._emojiClickHandler.bind(this);
 
     this._setInnerHandlers(this._data);
+    this.setCommentSubmitHandler(this._data);
   }
 
-  reset(comment) {
+  _reset(comment) {
     this.updateData(
       CommentInPopup.parseCommentToData(comment),
     );
@@ -89,38 +95,48 @@ export default class CommentInPopup extends SmartView{
 
   restoreHandlers() {
     this._setInnerHandlers(this._data);
-    // this.setFormSubmitHandler(this._callback.formSubmit);
+    // this._commentSubmitHandler(this._callback.submit);
   }
 
   _setInnerHandlers(data) {
-    if(data.comments.length !== 0){
-      this.getElement()
-        .querySelector('.film-details__comment-delete')
-        .addEventListener('click', this._commentDeleteHandler);
-    }
     this.getElement()
       .querySelector('.film-details__emoji-list_form')
       .addEventListener('change', this._emojiClickHandler);
     this.getElement()
       .querySelector('.film-details__comment-input')
       .addEventListener('input', this._commentTextInputHandler);
+    if(data.comments.length !== 0){
+      this.getElement()
+        .querySelector('.film-details__comment-delete')
+        .addEventListener('click', this._commentDeleteHandler);
+    }
+  }
+
+  setCommentSubmitHandler (callback) {
+    this._callback.commentSubmit = callback;
+    this.getElement().addEventListener('keydown', this._commentSubmitHandler);
+  }
+
+  _commentSubmitHandler(evt) {
+    if (!(isEnter(evt) && evt.ctrlKey)) {
+      return;
+    }
+    // this._callback.commentSubmit(CommentInPopup.parseDataToComment(this._data));
+    this._callback.commentSubmit();
+
+    // this._reset();
   }
 
   _commentDeleteHandler(evt) {
     evt.preventDefault();
-    const modifiedCommentsList = this._data.popupCommentsTemplate.slice();
-    console.log(this._data);
-    modifiedCommentsList.forEach((element) => {
-      console.log(element);
-      if(element.id === evt.target.dataset.id) {
-        console.log(element.id === evt.target.dataset.id);
-        modifiedCommentsList.splice(0,this._data.comments.indexOf(element.id));
-        return modifiedCommentsList;
+    const modifiedCommentsIdArray = [];
+    this._data.comments.forEach((element)=>{
+      if(element.key !== evt.target.dataset.id) {
+        modifiedCommentsIdArray.push(element);
       }
     });
-    // const removed = this._data.comments.splice(0,this._data.comments.indexOf(evt.target.dataset.id));
     this.updateData({
-      comments: this._data.popupCommentsTemplate,
+      comments: modifiedCommentsIdArray,
     });
   }
 
