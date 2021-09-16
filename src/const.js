@@ -27,3 +27,9 @@ const BLANK_COMMENT = {
 const BLANK_GENRE = [];
 
 export {FILM_CARD_COUNT_PER_STEP, FILM_CARD_MOCK_COUNT, TOP_COMMENTED_FILM_CARD_COUNT, BLANK_FILM, BLANK_COMMENT, BLANK_GENRE};
+
+export const SortType = {
+  DEFAULT: 'default',
+  DATE_DOWN: 'date-down',
+  RATING_DOWN: 'rating-down',
+};
