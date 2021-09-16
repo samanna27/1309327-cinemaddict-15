@@ -113,15 +113,19 @@ export default class CommentInPopup extends SmartView{
   }
 
   setCommentSubmitHandler (callback) {
+    console.log(this.setCommentSubmitHandler);
+    console.log(2, callback);
     this._callback.commentSubmit = callback;
     this.getElement().addEventListener('keydown', this._commentSubmitHandler);
   }
 
   _commentSubmitHandler(evt) {
+    console.log('a');
     if (!(isEnter(evt) && evt.ctrlKey)) {
       return;
     }
     // this._callback.commentSubmit(CommentInPopup.parseDataToComment(this._data));
+    console.log(1, this._callback.commentSubmit());
     this._callback.commentSubmit();
 
     // this._reset();
