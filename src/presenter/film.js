@@ -4,6 +4,8 @@ import CommentInPopupView from '../view/comments-in-popup';
 import FilmPopupGenreView from '../view/film-genre';
 import {render, RenderPosition, replace, remove} from '../utils/render.js';
 import { isEscEvent } from '../utils/common.js';
+import { getRandomInteger } from '../utils/common.js';
+import { commentsIds } from '../mock/film.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -21,6 +23,8 @@ export default class Film {
     this._mode = Mode.DEFAULT;
     this._filmPopupGenreComponent = new FilmPopupGenreView(film);
     this._commentInPopupComponent = new CommentInPopupView(film);
+    this._commentInPopupComponent.setCommentSubmitHandler(this.createNewComment);
+    // this._commentInPopupComponent.setCommentDeleteHandler(this.deleteComment);
 
     this._handleFilmCardClick = this._handleFilmCardClick.bind(this);
     this._handleAddedToWatchlistClick = this._handleAddedToWatchlistClick.bind(this);
@@ -28,6 +32,7 @@ export default class Film {
     this._handleAlreadyWatchedClick = this._handleAlreadyWatchedClick.bind(this);
     this._handlePopupClsButtonClick = this._handlePopupClsButtonClick.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
+    this.createNewComment=this.createNewComment.bind(this);
   }
 
   init(film) {
@@ -38,6 +43,7 @@ export default class Film {
 
     this._filmComponent = new FilmView(film);
     this._filmPopupComponent = new FilmPopupView(film);
+
 
     this._filmComponent.setClickHandler(this._handleFilmCardClick);
     this._filmComponent.setAddedToWatchlistClickHandler(this._handleAddedToWatchlistClick);
@@ -55,21 +61,37 @@ export default class Film {
 
     if (this._mode === Mode.DEFAULT) {
       replace(this._filmComponent, prevFilmComponent);
+      remove(prevFilmComponent);
     }
 
     if (this._mode === Mode.POPUP) {
       replace(this._filmPopupComponent, prevFilmPopupComponent);
       this._renderWholePopUp();
+      replace(this._filmComponent, prevFilmComponent);
     }
 
-    remove(prevFilmComponent);
     remove(prevFilmPopupComponent);
   }
 
   destroy() {
     remove(this._filmComponent);
     remove(this._filmPopupComponent);
+  }
 
+
+  createNewComment(film){
+    console.log('new comment is here');
+    this._film = film;
+    const prevCommentInPopupComponent = this._commentInPopupComponent;
+    console.log(this._film);
+    this._film.comments.push(getRandomInteger(0, commentsIds.length-1));
+
+    const updatedCommentInPopupComponent = new CommentInPopupView(film);
+    replace(prevCommentInPopupComponent, updatedCommentInPopupComponent);
+    // const commentsInPopupContainterElement = document.querySelector('.film-details__bottom-container');
+    // render(commentsInPopupContainterElement, updatedCommentInPopupComponent, RenderPosition.BEFOREEND);
+    // updatedCommentInPopupComponent._setInnerHandlers;
+    // updatedCommentInPopupComponent.setCommentSubmitHandler;
   }
 
   _renderWholePopUp (){
@@ -80,6 +102,10 @@ export default class Film {
     render(commentsInPopupContainterElement, this._commentInPopupComponent, RenderPosition.BEFOREEND);
   }
 
+  // _deleteComment(film){
+  //   const deletedCommentfilm.comments.push(getRandomInteger(0, commentsIds.length-1));
+  // }
+
   resetView() {
     if (this._mode !== Mode.DEFAULT) {
       this._replacePopupToFilmCard();
@@ -87,27 +113,31 @@ export default class Film {
   }
 
   _replaceFilmCardToPopup() {
-    replace(this._filmPopupComponent, this._filmComponent);
+    const popupRenderPlace = document.querySelector('.footer');
+    render(popupRenderPlace, this._filmPopupComponent, RenderPosition.AFTEREND);
     this._renderWholePopUp();
-
-    // const genreInPopupContainterElement = document.querySelector('.film-details__table');
-    // render(genreInPopupContainterElement, this._filmPopupGenreComponent, RenderPosition.BEFOREEND);
-
-    // const commentsInPopupContainterElement = document.querySelector('.film-details__bottom-container');
-    // render(commentsInPopupContainterElement, this._commentInPopupComponent, RenderPosition.BEFOREEND);
 
     document.querySelector('body').classList.add('hide-overflow');
 
     document.addEventListener('keydown', this._escKeyDownHandler);
+
+    this._filmPopupComponent.setAddedToWatchlistClickHandler(this._handleAddedToWatchlistClick);
+    this._filmPopupComponent.setFavoriteClickHandler(this._handleFavoriteClick);
+    this._filmPopupComponent.setAlreadyWatchedClickHandler(this._handleAlreadyWatchedClick);
+    this._filmPopupComponent.setPopupClsButtonClickHandler(this._handlePopupClsButtonClick);
+
     this._changeMode();
     this._mode = Mode.POPUP;
   }
 
   _replacePopupToFilmCard() {
-    replace(this._filmComponent, this._filmPopupComponent);
+    remove(this._filmPopupComponent);
+    // remove(this._filmPopupGenreComponent);
+    // this._filmPopupComponent.removeElement();
+
+    // replace(null, this._filmPopupComponent);
     document.querySelector('body').classList.remove('hide-overflow');
     document.removeEventListener('keydown', this._escKeyDownHandler);
-    remove(this._filmPopupGenreComponent);
     this._mode = Mode.DEFAULT;
   }
 
@@ -159,8 +189,8 @@ export default class Film {
     }
   }
 
-  _handlePopupClsButtonClick(film) {
-    this._changeData(film);
+  _handlePopupClsButtonClick() {
+    // this._changeData(film);
     this._replacePopupToFilmCard();
   }
 }

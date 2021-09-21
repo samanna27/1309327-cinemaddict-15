@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import { getRandomInteger } from '../utils/common.js';
+import { commentsIds } from './film.js';
 
-let id = 0;
 const EMOJI_AUTHOR_COUNT = 1;
 
 const getRandomArrayElements = (elements, count) => {
@@ -46,7 +46,7 @@ export const generateComment = () => {
   const date = generateDate();
 
   return {
-    id: id++,
+    id: commentsIds[getRandomInteger(0, commentsIds.length-1)],
     emoji: getRandomArrayElements(emoji, EMOJI_AUTHOR_COUNT),
     date: dayjs(date).format('YYYY/MM/DD HH:MM'),
     author: getRandomArrayElements(authors, EMOJI_AUTHOR_COUNT),

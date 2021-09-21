@@ -30,7 +30,7 @@ const createCommentTemplate = (data) => {
         <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
 
         <ul class="film-details__comments-list">
-          ${popupCommentsTemplate}
+          ${popupCommentsTemplate.join('')}
         </ul>
         <div class="film-details__new-comment">
           <div class="film-details__add-emoji-label">
@@ -80,10 +80,9 @@ export default class CommentInPopup extends SmartView{
     this._emojiClickHandler = this._emojiClickHandler.bind(this);
 
     this._setInnerHandlers(this._data);
-    this.setCommentSubmitHandler(this._data);
   }
 
-  _reset(comment) {
+  reset(comment) {
     this.updateData(
       CommentInPopup.parseCommentToData(comment),
     );
@@ -95,7 +94,7 @@ export default class CommentInPopup extends SmartView{
 
   restoreHandlers() {
     this._setInnerHandlers(this._data);
-    // this._commentSubmitHandler(this._callback.submit);
+    this._commentSubmitHandler(this._callback.submit);
   }
 
   _setInnerHandlers(data) {
@@ -108,40 +107,35 @@ export default class CommentInPopup extends SmartView{
     if(data.comments.length !== 0){
       this.getElement()
         .querySelector('.film-details__comment-delete')
-        .addEventListener('click', this._commentDeleteHandler);
+        .addEventListener('click', this._commentDeleteHandler());
     }
   }
 
   setCommentSubmitHandler (callback) {
-    console.log(this.setCommentSubmitHandler);
-    console.log(2, callback);
     this._callback.commentSubmit = callback;
     this.getElement().addEventListener('keydown', this._commentSubmitHandler);
   }
 
   _commentSubmitHandler(evt) {
-    console.log('a');
     if (!(isEnter(evt) && evt.ctrlKey)) {
       return;
     }
     // this._callback.commentSubmit(CommentInPopup.parseDataToComment(this._data));
-    console.log(1, this._callback.commentSubmit());
     this._callback.commentSubmit();
-
-    // this._reset();
   }
 
   _commentDeleteHandler(evt) {
-    evt.preventDefault();
-    const modifiedCommentsIdArray = [];
-    this._data.comments.forEach((element)=>{
-      if(element.key !== evt.target.dataset.id) {
-        modifiedCommentsIdArray.push(element);
-      }
-    });
-    this.updateData({
-      comments: modifiedCommentsIdArray,
-    });
+    // evt.preventDefault();
+    // const deletedCommentID = evt.target.dataset.id;
+    // const modifiedCommentsIdArray = [];
+    // this._data.comments.forEach((element)=>{
+    //   if(element.key !== evt.target.dataset.id) {
+    //     modifiedCommentsIdArray.push(element);
+    //   }
+    // });
+    // this.updateData({
+    //   comments: modifiedCommentsIdArray,
+    // });
   }
 
   _emojiClickHandler(evt) {
@@ -160,7 +154,6 @@ export default class CommentInPopup extends SmartView{
   }
 
   static parseCommentToData(comment) {
-
     return Object.assign(
       {},
       comment,
