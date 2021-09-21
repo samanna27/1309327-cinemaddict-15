@@ -1,18 +1,24 @@
 import { generateComment } from '../mock/comments';
 import SmartView from './smart';
-import { BLANK_COMMENT } from '../const';
 import { isEnter } from '../utils/common.js';
+import { BLANK_COMMENT } from '../const';
+import dayjs from 'dayjs';
 
 
-const createCommentTemplate = (data) => {
-  const { comments, isEmoji, popupCommentsTemplate } = data;
-  const commentsArray = new Array(comments.length).fill().map(generateComment);
+const createCommentTemplate = (commentsArray, newComment) => {
+  // const commentsArray = new Array(commentsIdArray.length).fill().map(generateComment);
 
-  if(data.isComment) {
+  if (newComment !== BLANK_COMMENT) {
+    commentsArray.push(newComment);
+  }
+
+  const popupCommentsTemplate = [];
+
+  if(commentsArray.length !== 0) {
     commentsArray.forEach((element)=> {
       popupCommentsTemplate.push(`<li class="film-details__comment">
           <span class="film-details__comment-emoji">
-            <img src="./images/emoji/${element.emoji}.png" width="55" height="55" alt="">
+            <img src="${element.emoji}" width="55" height="55" alt="">
           </span>
           <div>
             <p class="film-details__comment-text">${element.text}</p>
@@ -27,15 +33,14 @@ const createCommentTemplate = (data) => {
   } else {popupCommentsTemplate.push('');}
 
   return    `<section class="film-details__comments-wrap">
-        <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
+        <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${commentsArray.length}</span></h3>
 
         <ul class="film-details__comments-list">
           ${popupCommentsTemplate.join('')}
         </ul>
         <div class="film-details__new-comment">
-          <div class="film-details__add-emoji-label">
-          ${isEmoji !== ''? `<img src="./images/emoji/${isEmoji}.png" width="55" height="55" alt="emoji-${isEmoji}">`: '<img src="" width="55" height="55" alt=""></img>'}
-          </div>
+        <div class="film-details__add-emoji-label">
+        </div>
 
           <label class="film-details__comment-label">
           <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
@@ -70,16 +75,18 @@ const createCommentTemplate = (data) => {
 };
 
 export default class CommentInPopup extends SmartView{
-  constructor(comment = BLANK_COMMENT){
+  constructor(commentsIdArray, newComment = BLANK_COMMENT){
     super();
-    this._data = CommentInPopup.parseCommentToData(comment);
+    this._commentsIdArray = commentsIdArray;
+    this._commentsArray = new Array(commentsIdArray.length).fill().map(generateComment);
+    this._newComment = newComment;
 
     this._commentDeleteHandler = this._commentDeleteHandler.bind(this);
     this._commentTextInputHandler = this._commentTextInputHandler.bind(this);
     this._commentSubmitHandler = this._commentSubmitHandler.bind(this);
     this._emojiClickHandler = this._emojiClickHandler.bind(this);
 
-    this._setInnerHandlers(this._data);
+    this._setInnerHandlers();
   }
 
   reset(comment) {
@@ -89,25 +96,28 @@ export default class CommentInPopup extends SmartView{
   }
 
   getTemplate() {
-    return createCommentTemplate(this._data);
+    return createCommentTemplate(this._commentsArray, this._newComment);
   }
 
   restoreHandlers() {
-    this._setInnerHandlers(this._data);
-    this._commentSubmitHandler(this._callback.submit);
+    this._setInnerHandlers();
   }
 
-  _setInnerHandlers(data) {
+  _setInnerHandlers() {
     this.getElement()
       .querySelector('.film-details__emoji-list_form')
       .addEventListener('change', this._emojiClickHandler);
     this.getElement()
       .querySelector('.film-details__comment-input')
       .addEventListener('input', this._commentTextInputHandler);
-    if(data.comments.length !== 0){
+  }
+
+  setCommentDeleteHandler (callback) {
+    this._callback.commentDelete = callback;
+    if(this._commentsIdArray.length !== 0){
       this.getElement()
         .querySelector('.film-details__comment-delete')
-        .addEventListener('click', this._commentDeleteHandler());
+        .addEventListener('click', this._commentDeleteHandler);
     }
   }
 
@@ -117,68 +127,63 @@ export default class CommentInPopup extends SmartView{
   }
 
   _commentSubmitHandler(evt) {
-    if (!(isEnter(evt) && evt.ctrlKey)) {
-      return;
+    if (isEnter(evt) && evt.ctrlKey) {
+      this._callback.commentSubmit({
+        date: dayjs().format('YYYY/MM/DD HH:MM'),
+        text: document.querySelector('.film-details__comment-input').value,
+        emoji: this.getElement().querySelector('.film-details__add-emoji-label > img').src,
+      });
     }
-    // this._callback.commentSubmit(CommentInPopup.parseDataToComment(this._data));
-    this._callback.commentSubmit();
   }
 
   _commentDeleteHandler(evt) {
-    // evt.preventDefault();
-    // const deletedCommentID = evt.target.dataset.id;
-    // const modifiedCommentsIdArray = [];
-    // this._data.comments.forEach((element)=>{
-    //   if(element.key !== evt.target.dataset.id) {
-    //     modifiedCommentsIdArray.push(element);
-    //   }
-    // });
-    // this.updateData({
-    //   comments: modifiedCommentsIdArray,
-    // });
+    evt.preventDefault();
+    const commentToDeleteId = evt.target.dataset.id;
+    const updatedCommentsIdArray =[];
+    this._commentsIdArray.forEach((element) => {
+      if(element.toString() !== commentToDeleteId) {
+        updatedCommentsIdArray.push(element);
+      }
+    });
+    this._callback.commentDelete(commentToDeleteId);
   }
 
   _emojiClickHandler(evt) {
     evt.preventDefault();
-    this._data.isEmoji= evt.target.value;
-    this.updateData({
-      isEmoji: evt.target.value,
-    });
+    const emoji= evt.target.value;
+    this.getElement().querySelector('.film-details__add-emoji-label').innerHTML = `<img src="images/emoji/${emoji}.png" width="55" height="55" alt="emoji-${emoji}"></img>`;
   }
 
   _commentTextInputHandler(evt) {
     evt.preventDefault();
-    this.updateData({
-      text: evt.target.value,
-    }, true);
   }
 
-  static parseCommentToData(comment) {
-    return Object.assign(
-      {},
-      comment,
-      {
-        isComment: comment.comments.length!==0,
-        isEmoji: '',
-        popupCommentsTemplate: [],
-      },
-    );
-  }
+  // static parseCommentToData(comment) {
+  //   return Object.assign(
+  //     {},
+  //     comment,
+  //     {
+  //       isComment: comment.comments.length!==0,
+  //       isEmoji: '',
+  //       popupCommentsTemplate: [],
+  //     },
+  //   );
+  // }
 
-  static parseDataToComment(data) {
-    data = Object.assign({}, data);
+  // static parseDataToComment(data) {
+  //   data = Object.assign({}, data);
 
-    if (!data.isComment) {
-      data.isComment = null;
-    }
+  //   if (!data.isComment) {
+  //     data.isComment = null;
+  //   }
 
-    if (!data.isEmoji) {
-      data.isEmoji = null;
-    }
+  //   if (!data.isEmoji) {
+  //     data.isEmoji = null;
+  //   }
 
-    delete data.isComment;
-    delete data.isEmoji;
+  //   delete data.isComment;
+  //   delete data.isEmoji;
 
-    return data;
-  }
+  //   return data;
+  // }
 }
