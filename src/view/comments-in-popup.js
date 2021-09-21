@@ -1,31 +1,26 @@
 import { generateComment } from '../mock/comments';
 import SmartView from './smart';
 import { isEnter } from '../utils/common.js';
-import { BLANK_COMMENT } from '../const';
 import dayjs from 'dayjs';
+import { BLANK_COMMENT } from '../const';
 
 
-const createCommentTemplate = (commentsArray, newComment) => {
-  // const commentsArray = new Array(commentsIdArray.length).fill().map(generateComment);
-
-  if (newComment !== BLANK_COMMENT) {
-    commentsArray.push(newComment);
-  }
+const createCommentTemplate = (comments) => {
 
   const popupCommentsTemplate = [];
 
-  if(commentsArray.length !== 0) {
-    commentsArray.forEach((element)=> {
+  if(comments.length > 0) {
+    comments.forEach((comment)=> {
       popupCommentsTemplate.push(`<li class="film-details__comment">
           <span class="film-details__comment-emoji">
-            <img src="${element.emoji}" width="55" height="55" alt="">
+            <img src="${comment.emoji}" width="55" height="55" alt="">
           </span>
           <div>
-            <p class="film-details__comment-text">${element.text}</p>
+            <p class="film-details__comment-text">${comment.text}</p>
             <p class="film-details__comment-info">
-              <span class="film-details__comment-author">${element.author}</span>
-              <span class="film-details__comment-day">${element.date}</span>
-              <button class="film-details__comment-delete" data-id="${element.id}">Delete</button>
+              <span class="film-details__comment-author">${comment.author}</span>
+              <span class="film-details__comment-day">${comment.date}</span>
+              <button class="film-details__comment-delete" data-id="${comment.id}">Delete</button>
             </p>
           </div>
         </li>`);
@@ -33,7 +28,7 @@ const createCommentTemplate = (commentsArray, newComment) => {
   } else {popupCommentsTemplate.push('');}
 
   return    `<section class="film-details__comments-wrap">
-        <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${commentsArray.length}</span></h3>
+        <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
 
         <ul class="film-details__comments-list">
           ${popupCommentsTemplate.join('')}
@@ -75,10 +70,10 @@ const createCommentTemplate = (commentsArray, newComment) => {
 };
 
 export default class CommentInPopup extends SmartView{
-  constructor(commentsIdArray, newComment = BLANK_COMMENT){
+  constructor(commentsIds, newComment = BLANK_COMMENT){
     super();
-    this._commentsIdArray = commentsIdArray;
-    this._commentsArray = new Array(commentsIdArray.length).fill().map(generateComment);
+    this._commentsIds = commentsIds;
+    this._comments = new Array(commentsIds.length).fill().map(generateComment);
     this._newComment = newComment;
 
     this._commentDeleteHandler = this._commentDeleteHandler.bind(this);
@@ -89,14 +84,12 @@ export default class CommentInPopup extends SmartView{
     this._setInnerHandlers();
   }
 
-  reset(comment) {
-    this.updateData(
-      CommentInPopup.parseCommentToData(comment),
-    );
-  }
-
   getTemplate() {
-    return createCommentTemplate(this._commentsArray, this._newComment);
+    if (this._newComment !== BLANK_COMMENT) {
+      this._comments.push(this._newComment);
+    }
+
+    return createCommentTemplate(this._comments);
   }
 
   restoreHandlers() {
@@ -114,10 +107,10 @@ export default class CommentInPopup extends SmartView{
 
   setCommentDeleteHandler (callback) {
     this._callback.commentDelete = callback;
-    if(this._commentsIdArray.length !== 0){
+    if(this._commentsIds.length > 0){
       this.getElement()
-        .querySelector('.film-details__comment-delete')
-        .addEventListener('click', this._commentDeleteHandler);
+        .querySelectorAll('.film-details__comment-delete')
+        .forEach( (deleteButtonsElement) => deleteButtonsElement.addEventListener('click', this._commentDeleteHandler));
     }
   }
 
@@ -139,12 +132,6 @@ export default class CommentInPopup extends SmartView{
   _commentDeleteHandler(evt) {
     evt.preventDefault();
     const commentToDeleteId = evt.target.dataset.id;
-    const updatedCommentsIdArray =[];
-    this._commentsIdArray.forEach((element) => {
-      if(element.toString() !== commentToDeleteId) {
-        updatedCommentsIdArray.push(element);
-      }
-    });
     this._callback.commentDelete(commentToDeleteId);
   }
 
@@ -157,33 +144,4 @@ export default class CommentInPopup extends SmartView{
   _commentTextInputHandler(evt) {
     evt.preventDefault();
   }
-
-  // static parseCommentToData(comment) {
-  //   return Object.assign(
-  //     {},
-  //     comment,
-  //     {
-  //       isComment: comment.comments.length!==0,
-  //       isEmoji: '',
-  //       popupCommentsTemplate: [],
-  //     },
-  //   );
-  // }
-
-  // static parseDataToComment(data) {
-  //   data = Object.assign({}, data);
-
-  //   if (!data.isComment) {
-  //     data.isComment = null;
-  //   }
-
-  //   if (!data.isEmoji) {
-  //     data.isEmoji = null;
-  //   }
-
-  //   delete data.isComment;
-  //   delete data.isEmoji;
-
-  //   return data;
-  // }
 }

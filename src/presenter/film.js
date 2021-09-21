@@ -29,8 +29,8 @@ export default class Film {
     this._handleAlreadyWatchedClick = this._handleAlreadyWatchedClick.bind(this);
     this._handlePopupClsButtonClick = this._handlePopupClsButtonClick.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
-    this.createNewComment=this.createNewComment.bind(this);
-    this.deleteComment = this.deleteComment.bind(this);
+    this.createNewCommentHandler=this.createNewCommentHandler.bind(this);
+    this.deleteCommentHandler = this.deleteCommentHandler.bind(this);
   }
 
   init(film) {
@@ -51,8 +51,8 @@ export default class Film {
     this._filmPopupComponent.setAddedToWatchlistClickHandler(this._handleAddedToWatchlistClick);
     this._filmPopupComponent.setFavoriteClickHandler(this._handleFavoriteClick);
     this._filmPopupComponent.setAlreadyWatchedClickHandler(this._handleAlreadyWatchedClick);
-    this._commentInPopupComponent.setCommentSubmitHandler(this.createNewComment);
-    this._commentInPopupComponent.setCommentDeleteHandler(this.deleteComment);
+    this._commentInPopupComponent.setCommentSubmitHandler(this.createNewCommentHandler);
+    this._commentInPopupComponent.setCommentDeleteHandler(this.deleteCommentHandler);
 
     if (prevFilmComponent === null || prevFilmPopupComponent === null) {
       render(this._filmsListComponent, this._filmComponent, RenderPosition.BEFOREEND);
@@ -79,20 +79,20 @@ export default class Film {
   }
 
   _renderWholePopUp (){
-    const genreInPopupContainterElement = document.querySelector('.film-details__table');
-    render(genreInPopupContainterElement, this._filmPopupGenreComponent, RenderPosition.BEFOREEND);
+    const genreInPopupContainerElement = document.querySelector('.film-details__table');
+    render(genreInPopupContainerElement, this._filmPopupGenreComponent, RenderPosition.BEFOREEND);
 
-    const commentsInPopupContainterElement = document.querySelector('.film-details__bottom-container');
-    render(commentsInPopupContainterElement, this._commentInPopupComponent, RenderPosition.BEFOREEND);
+    const commentsInPopupContainerElement = document.querySelector('.film-details__bottom-container');
+    render(commentsInPopupContainerElement, this._commentInPopupComponent, RenderPosition.BEFOREEND);
   }
 
   restoreHandlers() {
-    this._commentInPopupComponent.setCommentSubmitHandler(this.createNewComment);
-    this._commentInPopupComponent.setCommentDeleteHandler(this.deleteComment);
+    this._commentInPopupComponent.setCommentSubmitHandler(this.createNewCommentHandler);
+    this._commentInPopupComponent.setCommentDeleteHandler(this.deleteCommentHandler);
 
   }
 
-  createNewComment(newComment){
+  createNewCommentHandler(newComment){
     newComment.id = nanoid();
 
     const prevCommentInPopupComponent = this._commentInPopupComponent;
@@ -114,18 +114,18 @@ export default class Film {
     this.restoreHandlers();
   }
 
-  deleteComment(commentToDeleteId){
+  deleteCommentHandler(commentToDeleteId){
     const prevCommentInPopupComponent = this._commentInPopupComponent;
-    const isEqual = (element) => {
-      element === commentToDeleteId;
-    };
-    const x = this._film.comments.findIndex(isEqual);
-    const deletedId = this._film.comments.splice(x);
+
+
+    const commentIndex = this._film.comments.findIndex((commentId) => commentId === commentToDeleteId);
+    this._film.comments.splice(commentIndex, 1);
 
     const updatedCommentInPopupComponent = new CommentInPopupView(this._film.comments);
-
     replace(updatedCommentInPopupComponent, prevCommentInPopupComponent);
+
     this._commentInPopupComponent = updatedCommentInPopupComponent;
+
     this._changeData(
       Object.assign(
         {},
