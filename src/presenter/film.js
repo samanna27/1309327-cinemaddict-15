@@ -214,6 +214,7 @@ export default class Film {
   _escKeyDownHandler(evt) {
     if (isEscEvent(evt)) {
       evt.preventDefault();
+      // this._commentInPopupComponent._reset(this._film);
       this._replacePopupToFilmCard();
     }
   }
