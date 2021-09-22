@@ -13,7 +13,7 @@ import {sortFilmDateDown, sortFilmRatingDown} from '../utils/task.js';
 import { FILM_CARD_COUNT_PER_STEP,  TOP_COMMENTED_FILM_CARD_COUNT, SortType } from '../const.js';
 
 export default class Board {
-  constructor(boardContainer) {
+  constructor(boardContainer, filmsModel) {
     this._boardContainer = boardContainer;
     this._renderedFilmCount = FILM_CARD_COUNT_PER_STEP;
     this._filmPresenter = new Map();
@@ -47,6 +47,10 @@ export default class Board {
     render(this._filmsContainerComponent, this._filmsListComponent, RenderPosition.BEFOREEND);
 
     this._renderBoard();
+  }
+
+  _getFilms() {
+    return this._filmsModel.getFilms;
   }
 
   _handleModeChange() {
