@@ -1,8 +1,8 @@
 import AbstractView from './abstract';
 import { BLANK_GENRE } from '../const';
 
-const createPopupGenreTemplate = (film) => {
-  const { genre } = film;
+const createPopupGenreTemplate = (genre) => {
+  // const { genre } = film;
 
   const popupGenreTemplate = [];
   if (genre.length !== 0) {

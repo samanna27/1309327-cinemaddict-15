@@ -59,7 +59,7 @@ const getRandomArrayElements = (elements, count) => {
   return result;
 };
 
-const commentsIds = [1, 2, 3, 4, 5];
+export const commentsIds = [1, 2, 3, 4, 5];
 const genres = [
   'Comedy',
   'Drama',
