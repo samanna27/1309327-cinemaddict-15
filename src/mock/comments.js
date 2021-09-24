@@ -46,7 +46,7 @@ export const generateComment = () => {
   const date = generateDate();
 
   return {
-    id: getRandomArrayElements(commentsIds, 1),
+    id: getRandomArrayElements(commentsIds, EMOJI_AUTHOR_COUNT),
     emoji: `./images/emoji/${getRandomArrayElements(emoji, EMOJI_AUTHOR_COUNT)}.png`,
     date: dayjs(date).format('YYYY/MM/DD HH:MM'),
     author: getRandomArrayElements(authors, EMOJI_AUTHOR_COUNT),

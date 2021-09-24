@@ -60,7 +60,7 @@ const getRandomArrayElements = (elements, count) => {
   return result;
 };
 
-export const commentsIds = new Array(getRandomInteger(0, COMMENTS_QUANTITY)).fill(nanoid());
+export const commentsIds = new Array(COMMENTS_QUANTITY).fill().map(nanoid);
 
 const genres = [
   'Comedy',

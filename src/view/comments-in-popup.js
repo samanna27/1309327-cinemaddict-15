@@ -7,24 +7,29 @@ import dayjs from 'dayjs';
 const createCommentTemplate = (comments, commentsIdsInFilm) => {
 
   const popupCommentsTemplate = [];
+  const commentsToRender = comments.slice();
 
-  if(comments.length > 0) {
-    comments.forEach((comment)=> {
-      console.log(comment.id, commentsIdsInFilm);
-      if(commentsIdsInFilm.includes(comment.id[0])) {
+  if(commentsIdsInFilm.length > 0) {
+    commentsIdsInFilm.forEach((id)=> {
+      const index = commentsToRender.findIndex((comment) => comment.id === id);
+      if(index === -1){
+        console.log('no such index');
+        popupCommentsTemplate.push('');
+      } else {
+        console.log('URA!!!');
         popupCommentsTemplate.push(`<li class="film-details__comment">
-          <span class="film-details__comment-emoji">
-            <img src="${comment.emoji}" width="55" height="55" alt="">
-          </span>
-          <div>
-            <p class="film-details__comment-text">${comment.text}</p>
-            <p class="film-details__comment-info">
-              <span class="film-details__comment-author">${comment.author}</span>
-              <span class="film-details__comment-day">${comment.date}</span>
-              <button class="film-details__comment-delete" data-id="${comment.id}">Delete</button>
-            </p>
-          </div>
-        </li>`);
+            <span class="film-details__comment-emoji">
+              <img src="${commentsToRender[index].emoji}" width="55" height="55" alt="">
+            </span>
+            <div>
+              <p class="film-details__comment-text">${commentsToRender[index].text}</p>
+              <p class="film-details__comment-info">
+                <span class="film-details__comment-author">${commentsToRender[index].author}</span>
+                <span class="film-details__comment-day">${commentsToRender[index].date}</span>
+                <button class="film-details__comment-delete" data-id="${commentsToRender[index].id}">Delete</button>
+              </p>
+            </div>
+          </li>`);
       }
     });
   } else {popupCommentsTemplate.push('');}
