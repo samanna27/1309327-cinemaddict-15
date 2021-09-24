@@ -1,17 +1,18 @@
-import { generateComment } from '../mock/comments';
+import he from 'he';
+// import { generateComment } from '../mock/comments';
 import SmartView from './smart';
 import { isEnter } from '../utils/common.js';
 import dayjs from 'dayjs';
-import { BLANK_COMMENT } from '../const';
 
-
-const createCommentTemplate = (comments) => {
+const createCommentTemplate = (comments, commentsIdsInFilm) => {
 
   const popupCommentsTemplate = [];
 
   if(comments.length > 0) {
     comments.forEach((comment)=> {
-      popupCommentsTemplate.push(`<li class="film-details__comment">
+      console.log(comment.id, commentsIdsInFilm);
+      if(commentsIdsInFilm.includes(comment.id[0])) {
+        popupCommentsTemplate.push(`<li class="film-details__comment">
           <span class="film-details__comment-emoji">
             <img src="${comment.emoji}" width="55" height="55" alt="">
           </span>
@@ -24,6 +25,7 @@ const createCommentTemplate = (comments) => {
             </p>
           </div>
         </li>`);
+      }
     });
   } else {popupCommentsTemplate.push('');}
 
@@ -38,7 +40,8 @@ const createCommentTemplate = (comments) => {
         </div>
 
           <label class="film-details__comment-label">
-          <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
+          <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">
+          </textarea>
           </label>
 
           <div class="film-details__emoji-list">
@@ -70,11 +73,13 @@ const createCommentTemplate = (comments) => {
 };
 
 export default class CommentInPopup extends SmartView{
-  constructor(commentsIds, newComment = BLANK_COMMENT){
+  constructor(comments, film){
+
     super();
-    this._commentsIds = commentsIds;
-    this._comments = new Array(commentsIds.length).fill().map(generateComment);
-    this._newComment = newComment;
+    this._comments = comments;
+    this._commentsIdsInFilm = film.comments;
+    // this._commentsIds = commentsIds;
+    // this._comments = new Array(commentsIds.length).fill().map(generateComment);
 
     this._commentDeleteHandler = this._commentDeleteHandler.bind(this);
     this._commentTextInputHandler = this._commentTextInputHandler.bind(this);
@@ -85,11 +90,7 @@ export default class CommentInPopup extends SmartView{
   }
 
   getTemplate() {
-    if (this._newComment !== BLANK_COMMENT) {
-      this._comments.push(this._newComment);
-    }
-
-    return createCommentTemplate(this._comments);
+    return createCommentTemplate(this._comments, this._commentsIdsInFilm);
   }
 
   restoreHandlers() {
@@ -107,10 +108,10 @@ export default class CommentInPopup extends SmartView{
 
   setCommentDeleteHandler (callback) {
     this._callback.commentDelete = callback;
-    if(this._commentsIds.length > 0){
+    if(this._comments !== null){
       this.getElement()
         .querySelectorAll('.film-details__comment-delete')
-        .forEach( (deleteButtonsElement) => deleteButtonsElement.addEventListener('click', this._commentDeleteHandler));
+        .forEach((deleteButtonsElement) => deleteButtonsElement.addEventListener('click', this._commentDeleteHandler));
     }
   }
 

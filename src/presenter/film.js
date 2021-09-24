@@ -3,8 +3,10 @@ import FilmPopupView from '../view/film-pop-up';
 import CommentInPopupView from '../view/comments-in-popup';
 import FilmPopupGenreView from '../view/film-genre';
 import {render, RenderPosition, replace, remove} from '../utils/render.js';
+import {UserAction, UpdateType} from '../const.js';
 import { isEscEvent } from '../utils/common.js';
 import {nanoid} from 'nanoid';
+import { BLANK_COMMENT } from '../const';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -12,8 +14,9 @@ const Mode = {
 };
 
 export default class Film {
-  constructor(place, film, changeData, changeMode){
+  constructor(film, comments, place, changeData, changeMode){
     this._filmsListComponent = place;
+    this._film = film;
     this._changeData = changeData;
     this._changeMode = changeMode;
 
@@ -21,7 +24,8 @@ export default class Film {
     this._filmPopupComponent = null;
     this._mode = Mode.DEFAULT;
     this._filmPopupGenreComponent = new FilmPopupGenreView(film.genre);
-    this._commentInPopupComponent = new CommentInPopupView(film.comments);
+    this._comments = comments;
+    this._commentInPopupComponent = new CommentInPopupView(this._comments, this._film);
 
     this._handleFilmCardClick = this._handleFilmCardClick.bind(this);
     this._handleAddedToWatchlistClick = this._handleAddedToWatchlistClick.bind(this);
@@ -95,13 +99,19 @@ export default class Film {
   createNewCommentHandler(newComment){
     newComment.id = nanoid();
 
+    if (this._newComment !== BLANK_COMMENT) {
+      this._comments.push(this._newComment);
+    }
+
     const prevCommentInPopupComponent = this._commentInPopupComponent;
-    const updatedCommentInPopupComponent = new CommentInPopupView(this._film.comments, newComment);
+    const updatedCommentInPopupComponent = new CommentInPopupView(this._comments);
     this._film.comments.push(newComment.id);
 
     replace(updatedCommentInPopupComponent, prevCommentInPopupComponent);
     this._commentInPopupComponent = updatedCommentInPopupComponent;
     this._changeData(
+      UserAction.ADD_COMMENT,
+      UpdateType.PATCH,
       Object.assign(
         {},
         this._film,
@@ -127,6 +137,8 @@ export default class Film {
     this._commentInPopupComponent = updatedCommentInPopupComponent;
 
     this._changeData(
+      UserAction.DELETE_COMMENT,
+      UpdateType.PATCH,
       Object.assign(
         {},
         this._film,
@@ -177,6 +189,8 @@ export default class Film {
 
   _handleFavoriteClick() {
     this._changeData(
+      UserAction.UPDATE_FILM,
+      UpdateType.PATCH,
       Object.assign(
         {},
         this._film,
@@ -189,6 +203,8 @@ export default class Film {
 
   _handleAddedToWatchlistClick() {
     this._changeData(
+      UserAction.UPDATE_FILM,
+      UpdateType.PATCH,
       Object.assign(
         {},
         this._film,
@@ -201,6 +217,8 @@ export default class Film {
 
   _handleAlreadyWatchedClick() {
     this._changeData(
+      UserAction.UPDATE_FILM,
+      UpdateType.PATCH,
       Object.assign(
         {},
         this._film,
@@ -218,7 +236,12 @@ export default class Film {
     }
   }
 
-  _handlePopupClsButtonClick() {
+  _handlePopupClsButtonClick(film) {
+    this._changeData(
+      UserAction.UPDATE_FILM,
+      UpdateType.PATCH,
+      film,
+    );
     this._replacePopupToFilmCard();
   }
 }

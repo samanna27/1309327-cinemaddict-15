@@ -1,17 +1,19 @@
 import AbstractView from './abstract';
 
-const createSiteMenuItemTemplate = (filters) => {
-  const {name, count} = filters;
+const createSiteMenuItemTemplate = (filters, currentFilterType) => {
+  const {type, name, count} = filters;
 
   return (
     `<a href="#${name}" class="main-navigation__item"
+    ${type === currentFilterType ? 'checked' : ''}
     ${count === 0 ? 'disabled' : ''}
+    value="${type}"
     >${name.toString()[0].toUpperCase()+name.toString().slice(1)} <span class="main-navigation__item-count">${count}</span></a>`
   );
 };
 
-const createSiteMenuTemplate = (filters) => {
-  const filterItemsTemplate = filters.map((filter, index) => createSiteMenuItemTemplate(filter, index === 0)).slice(1).join('');
+const createSiteMenuTemplate = (filters, currentFilterType) => {
+  const filterItemsTemplate = filters.map((filter) => createSiteMenuItemTemplate(filter, currentFilterType)).slice(1).join('');
 
   return(
     `<section><nav class="main-navigation">
@@ -27,13 +29,26 @@ const createSiteMenuTemplate = (filters) => {
 };
 
 export default class SiteMenu extends AbstractView {
-  constructor(filters) {
+  constructor(filters, currentFilterType) {
     super();
     this._filters = filters;
+    this._currentFilter = currentFilterType;
+
+    this._filterTypeChangeHandler = this._filterTypeChangeHandler.bind(this);
   }
 
   getTemplate() {
-    return createSiteMenuTemplate(this._filters);
+    return createSiteMenuTemplate(this._filters, this._currentFilter);
+  }
+
+  _filterTypeChangeHandler(evt) {
+    evt.preventDefault();
+    this._callback.filterTypeChange(evt.target.value);
+  }
+
+  setFilterTypeChangeHandler(callback) {
+    this._callback.filterTypeChange = callback;
+    this.getElement().addEventListener('change', this._filterTypeChangeHandler);
   }
 }
 
