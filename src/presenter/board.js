@@ -81,20 +81,6 @@ export default class Board {
     this._commentedFilmPresenter.forEach((presenter) => presenter.resetView());
   }
 
-  // _handleFilmChange(updatedFilm) {
-  // this._boardFilms = updateItem(this._boardFilms, updatedFilm);
-  // this._sourcedBoardFilms = updateItem(this._sourcedBoardFilms, updatedFilm);
-  // if(this._filmPresenter.has(updatedFilm.id)){
-  //   this._filmPresenter.get(updatedFilm.id).init(updatedFilm);
-  // }
-  // if(this._topFilmPresenter.has(updatedFilm.id)){
-  //   this._topFilmPresenter.get(updatedFilm.id).init(updatedFilm);
-  // }
-  // if(this._commentedFilmPresenter.has(updatedFilm.id)){
-  //   this._commentedFilmPresenter.get(updatedFilm.id).init(updatedFilm);
-  // }
-  // }
-
   _handleViewAction(actionType, updateType, update) {
     switch (actionType) {
       case UserAction.UPDATE_FILM:
@@ -112,7 +98,6 @@ export default class Board {
   _handleModelEvent(updateType, data) {
     switch (updateType) {
       case UpdateType.PATCH:
-        // this._filmPresenter.get(data.id).init(data);
         if(this._filmPresenter.has(data.id)){
           this._filmPresenter.get(data.id).init(data);
         }
@@ -287,7 +272,6 @@ export default class Board {
     }
 
     this._renderSort();
-    // this._renderFilmList(this._filmsListComponent);
     this._renderFilms(films.slice(0, Math.min(filmCount, this._renderedFilmCount)), this._comments, this._filmsListComponent);
 
     if (filmCount > this._renderedFilmCount) {

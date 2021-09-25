@@ -1,5 +1,4 @@
 import he from 'he';
-// import { generateComment } from '../mock/comments';
 import SmartView from './smart';
 import { isEnter } from '../utils/common.js';
 import dayjs from 'dayjs';
@@ -43,7 +42,7 @@ const createCommentTemplate = (comments, commentsIdsInFilm) => {
         </div>
 
           <label class="film-details__comment-label">
-          <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">
+          <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${he.encode()}
           </textarea>
           </label>
 
@@ -81,8 +80,6 @@ export default class CommentInPopup extends SmartView{
     super();
     this._comments = comments;
     this._commentsIdsInFilm = film.commentsIds;
-    // this._commentsIds = commentsIds;
-    // this._comments = new Array(commentsIds.length).fill().map(generateComment);
 
     this._commentDeleteHandler = this._commentDeleteHandler.bind(this);
     this._commentTextInputHandler = this._commentTextInputHandler.bind(this);
