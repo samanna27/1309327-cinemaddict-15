@@ -7,7 +7,7 @@ import NoFilmsView from '../view/no-films-message';
 import TopFilmsView from '../view/top-rated-films';
 import MostCommentedFilmsView from '../view/most-commented-films';
 import FilmPresenter from './film.js';
-import {render, RenderPosition, remove} from '../utils/render.js';
+import {render, RenderPosition, remove, replace} from '../utils/render.js';
 import {sortFilmDateDown, sortFilmRatingDown} from '../utils/task.js';
 import {filter} from '../utils/filter.js';
 import { FILM_CARD_COUNT_PER_STEP,  TOP_COMMENTED_FILM_CARD_COUNT, SortType, UpdateType, UserAction, FilterType } from '../const.js';
@@ -125,11 +125,11 @@ export default class Board {
         break;
       case UpdateType.MINOR:
         this._clearBoard();
-        this._renderBoard();
+        this._renderBoard(updateType);
         break;
       case UpdateType.MAJOR:
         this._clearBoard({resetRenderedFilmCount: true, resetSortType: true});
-        this._renderBoard();
+        this._renderBoard(updateType);
         break;
     }
   }
@@ -140,8 +140,16 @@ export default class Board {
     }
 
     this._currentSortType = sortType;
+
+    const prevSortComponent = this._sortComponent;
+
+    this._sortComponent = new SortingView(this._currentSortType);
+
+    replace(this._sortComponent, prevSortComponent);
+    this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
+
     this._clearFilmList();
-    this._renderFilmList(this._filmsListComponent);
+    this._renderFilmList(this._filmsListComponent, this._comments);
   }
 
   _renderSort() {
@@ -150,6 +158,7 @@ export default class Board {
     }
 
     this._sortComponent = new SortingView(this._currentSortType);
+
     this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
 
     render(this._boardComponent, this._sortComponent, RenderPosition.BEFOREBEGIN);
@@ -268,12 +277,12 @@ export default class Board {
     }
   }
 
-  _renderBoard() {
+  _renderBoard(updateType) {
     const films = this._getFilms();
     const filmCount = films.length;
 
     if (filmCount === 0) {
-      render(this._renderNoFilms);
+      this._renderNoFilms();
       return;
     }
 
@@ -285,7 +294,9 @@ export default class Board {
       this._renderShowMoreButton();
     }
 
-    this._renderTopFilms();
-    this._renderMostCommentedFilms();
+    if(updateType !== 'MAJOR' && updateType !== 'MINOR') {
+      this._renderTopFilms();
+      this._renderMostCommentedFilms();
+    }
   }
 }

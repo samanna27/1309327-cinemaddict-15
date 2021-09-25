@@ -1,25 +1,26 @@
 import AbstractView from './abstract';
 
-const createSiteMenuItemTemplate = (filters, currentFilterType) => {
-  const {type, name, count} = filters;
+const createSiteMenuItemTemplate = (filter, currentFilterType) => {
+  const {type, name, count} = filter;
 
   return (
-    `<a href="#${name}" class="main-navigation__item"
-    ${type === currentFilterType ? 'checked' : ''}
+    `<a href="#${name}" class="main-navigation__item ${type === currentFilterType ? 'main-navigation__item--active' : ''}"
     ${count === 0 ? 'disabled' : ''}
-    value="${type}"
+    id="${type}"
     >${name.toString()[0].toUpperCase()+name.toString().slice(1)} <span class="main-navigation__item-count">${count}</span></a>`
   );
 };
 
 const createSiteMenuTemplate = (filters, currentFilterType) => {
+  const {type, count} = filters[0];
   const filterItemsTemplate = filters.map((filter) => createSiteMenuItemTemplate(filter, currentFilterType)).slice(1).join('');
 
   return(
     `<section><nav class="main-navigation">
       <div class="main-navigation__items">
-        <a href="#All" class="main-navigation__item"
-        ${filters[0].count === 0 ? 'disabled' : ''}
+        <a href="#All" class="main-navigation__item ${type === currentFilterType ? 'main-navigation__item--active' : ''}"
+        ${count === 0 ? 'disabled' : ''}
+        id="${type}"
         >All movies</a>
         ${filterItemsTemplate}
       </div>
@@ -43,12 +44,12 @@ export default class SiteMenu extends AbstractView {
 
   _filterTypeChangeHandler(evt) {
     evt.preventDefault();
-    this._callback.filterTypeChange(evt.target.value);
+    this._callback.filterTypeChange(evt.target.id);
   }
 
   setFilterTypeChangeHandler(callback) {
     this._callback.filterTypeChange = callback;
-    this.getElement().addEventListener('change', this._filterTypeChangeHandler);
+    this.getElement().querySelectorAll('.main-navigation__item').forEach((filterLinkElement) => filterLinkElement.addEventListener('click', this._filterTypeChangeHandler));
   }
 }
 

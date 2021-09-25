@@ -9,14 +9,12 @@ const createCommentTemplate = (comments, commentsIdsInFilm) => {
   const popupCommentsTemplate = [];
   const commentsToRender = comments.slice();
 
-  if(commentsIdsInFilm.length > 0) {
+  if(commentsIdsInFilm !== null) {
     commentsIdsInFilm.forEach((id)=> {
       const index = commentsToRender.findIndex((comment) => comment.id === id);
       if(index === -1){
-        console.log('no such index');
         popupCommentsTemplate.push('');
       } else {
-        console.log('URA!!!');
         popupCommentsTemplate.push(`<li class="film-details__comment">
             <span class="film-details__comment-emoji">
               <img src="${commentsToRender[index].emoji}" width="55" height="55" alt="">
@@ -35,7 +33,7 @@ const createCommentTemplate = (comments, commentsIdsInFilm) => {
   } else {popupCommentsTemplate.push('');}
 
   return    `<section class="film-details__comments-wrap">
-        <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
+        <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${commentsIdsInFilm.length}</span></h3>
 
         <ul class="film-details__comments-list">
           ${popupCommentsTemplate.join('')}
@@ -82,7 +80,7 @@ export default class CommentInPopup extends SmartView{
 
     super();
     this._comments = comments;
-    this._commentsIdsInFilm = film.comments;
+    this._commentsIdsInFilm = film.commentsIds;
     // this._commentsIds = commentsIds;
     // this._comments = new Array(commentsIds.length).fill().map(generateComment);
 

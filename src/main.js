@@ -13,9 +13,11 @@ import FilterModel from './model/filter.js';
 const films = new Array(FILM_CARD_MOCK_COUNT).fill().map(generateFilm);
 
 let commentsQuantity = 0;
-films.forEach((film) => {commentsQuantity += film.comments.length;});
-
-const comments = new Array(commentsQuantity).fill().map(generateComment);
+const comments = new Array(commentsQuantity).fill();
+films.forEach((film) => {
+  commentsQuantity += film.commentsIds.length;
+  film.commentsIds.forEach((id)=> comments.push(generateComment(id)));
+});
 
 const filmsModel = new FilmsModel();
 filmsModel.setFilms(films);

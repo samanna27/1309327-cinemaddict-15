@@ -6,7 +6,6 @@ import {render, RenderPosition, replace, remove} from '../utils/render.js';
 import {UserAction, UpdateType} from '../const.js';
 import { isEscEvent } from '../utils/common.js';
 import {nanoid} from 'nanoid';
-import { BLANK_COMMENT } from '../const';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -17,6 +16,8 @@ export default class Film {
   constructor(film, comments, place, changeData, changeMode){
     this._filmsListComponent = place;
     this._film = film;
+    this._commentToDeleteID = null;
+    this._newComment = null;
     this._changeData = changeData;
     this._changeMode = changeMode;
 
@@ -98,28 +99,27 @@ export default class Film {
 
   createNewCommentHandler(newComment){
     newComment.id = nanoid();
+    this._film.commentsIds.push(newComment.id);
+    this._newComment = newComment;
 
-    if (this._newComment !== BLANK_COMMENT) {
-      this._comments.push(this._newComment);
-    }
+    this._comments.push(newComment);
 
-    const prevCommentInPopupComponent = this._commentInPopupComponent;
-    const updatedCommentInPopupComponent = new CommentInPopupView(this._comments);
-    this._film.comments.push(newComment.id);
-
-    replace(updatedCommentInPopupComponent, prevCommentInPopupComponent);
-    this._commentInPopupComponent = updatedCommentInPopupComponent;
     this._changeData(
       UserAction.ADD_COMMENT,
       UpdateType.PATCH,
       Object.assign(
         {},
         this._film,
-        {
-          comments: this._film.comments,
-        },
+        this._newComments,
       ),
     );
+
+    const prevCommentInPopupComponent = this._commentInPopupComponent;
+    const updatedCommentInPopupComponent = new CommentInPopupView(this._comments, this._film);
+
+    replace(updatedCommentInPopupComponent, prevCommentInPopupComponent);
+    this._commentInPopupComponent = updatedCommentInPopupComponent;
+
     this._commentInPopupComponent.restoreHandlers();
     this.restoreHandlers();
   }
@@ -127,14 +127,10 @@ export default class Film {
   deleteCommentHandler(commentToDeleteId){
     const prevCommentInPopupComponent = this._commentInPopupComponent;
 
+    this._commentToDeleteId = {commentToDeleteId};
 
-    const commentIndex = this._film.comments.findIndex((commentId) => commentId === commentToDeleteId);
-    this._film.comments.splice(commentIndex, 1);
-
-    const updatedCommentInPopupComponent = new CommentInPopupView(this._film.comments);
-    replace(updatedCommentInPopupComponent, prevCommentInPopupComponent);
-
-    this._commentInPopupComponent = updatedCommentInPopupComponent;
+    const commentIndex = this._film.commentsIds.findIndex((commentId) => commentId === commentToDeleteId);
+    this._film.commentsIds.splice(commentIndex, 1);
 
     this._changeData(
       UserAction.DELETE_COMMENT,
@@ -142,11 +138,16 @@ export default class Film {
       Object.assign(
         {},
         this._film,
-        {
-          comments: this._film.comments,
-        },
+        this._commentToDeleteId,
       ),
     );
+    this._commentInPopupComponent.restoreHandlers();
+    this.restoreHandlers();
+
+    const updatedCommentInPopupComponent = new CommentInPopupView(this._comments, this._film);
+    replace(updatedCommentInPopupComponent, prevCommentInPopupComponent);
+
+    this._commentInPopupComponent = updatedCommentInPopupComponent;
     this._commentInPopupComponent.restoreHandlers();
     this.restoreHandlers();
   }
@@ -190,7 +191,7 @@ export default class Film {
   _handleFavoriteClick() {
     this._changeData(
       UserAction.UPDATE_FILM,
-      UpdateType.PATCH,
+      (this._mode === Mode.POPUP? UpdateType.PATCH: UpdateType.MINOR),
       Object.assign(
         {},
         this._film,
@@ -204,7 +205,7 @@ export default class Film {
   _handleAddedToWatchlistClick() {
     this._changeData(
       UserAction.UPDATE_FILM,
-      UpdateType.PATCH,
+      (this._mode === Mode.POPUP? UpdateType.PATCH: UpdateType.MINOR),
       Object.assign(
         {},
         this._film,
@@ -218,7 +219,7 @@ export default class Film {
   _handleAlreadyWatchedClick() {
     this._changeData(
       UserAction.UPDATE_FILM,
-      UpdateType.PATCH,
+      (this._mode === Mode.POPUP? UpdateType.PATCH: UpdateType.MINOR),
       Object.assign(
         {},
         this._film,

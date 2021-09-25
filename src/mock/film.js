@@ -125,7 +125,7 @@ export const generateFilm = () => {
     duration: `${getRandomInteger(0,3)}h ${getRandomInteger(0,60)}m`,
     country: getRandomArrayElements(countries, DIRECTOR_COUNTRY_COUNT),
     genre: getRandomArrayElements(genres, getRandomInteger(GENRES_ACTORS_WRITERS_MIN, GENRES_ACTORS_WRITERS_MAX)),
-    comments: getRandomArrayElements(commentsIds, getRandomInteger(0, COMMENTS_IN_FILM)),
+    commentsIds: getRandomArrayElements(commentsIds, getRandomInteger(0, COMMENTS_IN_FILM)),
     isAddedToWatchlist: Boolean(getRandomInteger(0, 1)),
     isAlreadyWatched: Boolean(getRandomInteger(0, 1)),
     isFavorite: Boolean(getRandomInteger(0, 1)),
