@@ -1,34 +1,38 @@
-import { generateComment } from '../mock/comments';
+import he from 'he';
 import SmartView from './smart';
 import { isEnter } from '../utils/common.js';
 import dayjs from 'dayjs';
-import { BLANK_COMMENT } from '../const';
 
-
-const createCommentTemplate = (comments) => {
+const createCommentTemplate = (comments, commentsIdsInFilm) => {
 
   const popupCommentsTemplate = [];
+  const commentsToRender = comments.slice();
 
-  if(comments.length > 0) {
-    comments.forEach((comment)=> {
-      popupCommentsTemplate.push(`<li class="film-details__comment">
-          <span class="film-details__comment-emoji">
-            <img src="${comment.emoji}" width="55" height="55" alt="">
-          </span>
-          <div>
-            <p class="film-details__comment-text">${comment.text}</p>
-            <p class="film-details__comment-info">
-              <span class="film-details__comment-author">${comment.author}</span>
-              <span class="film-details__comment-day">${comment.date}</span>
-              <button class="film-details__comment-delete" data-id="${comment.id}">Delete</button>
-            </p>
-          </div>
-        </li>`);
+  if(commentsIdsInFilm !== null) {
+    commentsIdsInFilm.forEach((id)=> {
+      const index = commentsToRender.findIndex((comment) => comment.id === id);
+      if(index === -1){
+        popupCommentsTemplate.push('');
+      } else {
+        popupCommentsTemplate.push(`<li class="film-details__comment">
+            <span class="film-details__comment-emoji">
+              <img src="${commentsToRender[index].emoji}" width="55" height="55" alt="">
+            </span>
+            <div>
+              <p class="film-details__comment-text">${commentsToRender[index].text}</p>
+              <p class="film-details__comment-info">
+                <span class="film-details__comment-author">${commentsToRender[index].author}</span>
+                <span class="film-details__comment-day">${commentsToRender[index].date}</span>
+                <button class="film-details__comment-delete" data-id="${commentsToRender[index].id}">Delete</button>
+              </p>
+            </div>
+          </li>`);
+      }
     });
   } else {popupCommentsTemplate.push('');}
 
   return    `<section class="film-details__comments-wrap">
-        <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
+        <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${commentsIdsInFilm.length}</span></h3>
 
         <ul class="film-details__comments-list">
           ${popupCommentsTemplate.join('')}
@@ -38,7 +42,8 @@ const createCommentTemplate = (comments) => {
         </div>
 
           <label class="film-details__comment-label">
-          <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
+          <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${he.encode()}
+          </textarea>
           </label>
 
           <div class="film-details__emoji-list">
@@ -70,11 +75,11 @@ const createCommentTemplate = (comments) => {
 };
 
 export default class CommentInPopup extends SmartView{
-  constructor(commentsIds, newComment = BLANK_COMMENT){
+  constructor(comments, film){
+
     super();
-    this._commentsIds = commentsIds;
-    this._comments = new Array(commentsIds.length).fill().map(generateComment);
-    this._newComment = newComment;
+    this._comments = comments;
+    this._commentsIdsInFilm = film.commentsIds;
 
     this._commentDeleteHandler = this._commentDeleteHandler.bind(this);
     this._commentTextInputHandler = this._commentTextInputHandler.bind(this);
@@ -85,11 +90,7 @@ export default class CommentInPopup extends SmartView{
   }
 
   getTemplate() {
-    if (this._newComment !== BLANK_COMMENT) {
-      this._comments.push(this._newComment);
-    }
-
-    return createCommentTemplate(this._comments);
+    return createCommentTemplate(this._comments, this._commentsIdsInFilm);
   }
 
   restoreHandlers() {
@@ -107,10 +108,10 @@ export default class CommentInPopup extends SmartView{
 
   setCommentDeleteHandler (callback) {
     this._callback.commentDelete = callback;
-    if(this._commentsIds.length > 0){
+    if(this._comments !== null){
       this.getElement()
         .querySelectorAll('.film-details__comment-delete')
-        .forEach( (deleteButtonsElement) => deleteButtonsElement.addEventListener('click', this._commentDeleteHandler));
+        .forEach((deleteButtonsElement) => deleteButtonsElement.addEventListener('click', this._commentDeleteHandler));
     }
   }
 

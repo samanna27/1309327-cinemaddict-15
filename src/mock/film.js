@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
 import {nanoid} from 'nanoid';
 import { getRandomInteger } from '../utils/common.js';
+import { COMMENTS_QUANTITY, COMMENTS_IN_FILM } from '../const.js';
 
 const SENTENCE_COUNT = 5;
 const RATING_MIN=0;
@@ -59,7 +60,8 @@ const getRandomArrayElements = (elements, count) => {
   return result;
 };
 
-export const commentsIds = [1, 2, 3, 4, 5];
+export const commentsIds = new Array(COMMENTS_QUANTITY).fill().map(nanoid);
+
 const genres = [
   'Comedy',
   'Drama',
@@ -123,7 +125,7 @@ export const generateFilm = () => {
     duration: `${getRandomInteger(0,3)}h ${getRandomInteger(0,60)}m`,
     country: getRandomArrayElements(countries, DIRECTOR_COUNTRY_COUNT),
     genre: getRandomArrayElements(genres, getRandomInteger(GENRES_ACTORS_WRITERS_MIN, GENRES_ACTORS_WRITERS_MAX)),
-    comments: getRandomArrayElements(commentsIds, getRandomInteger(0, commentsIds.length-1)),
+    commentsIds: getRandomArrayElements(commentsIds, getRandomInteger(0, COMMENTS_IN_FILM)),
     isAddedToWatchlist: Boolean(getRandomInteger(0, 1)),
     isAlreadyWatched: Boolean(getRandomInteger(0, 1)),
     isFavorite: Boolean(getRandomInteger(0, 1)),
