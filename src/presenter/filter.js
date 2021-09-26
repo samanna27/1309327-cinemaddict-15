@@ -2,6 +2,7 @@ import FilterView from '../view/site-menu.js';
 import {render, RenderPosition, replace, remove} from '../utils/render.js';
 import {filter} from '../utils/filter.js';
 import {FilterType, UpdateType} from '../const.js';
+import {filmStatisticsViewComponent, boardPresenter, siteMenuElement, handleSiteMenuClick } from '../main.js';
 
 export default class Filter {
   constructor(filterContainer, filterModel, filmsModel) {
@@ -12,7 +13,7 @@ export default class Filter {
     this._filterComponent = null;
 
     this._handleModelEvent = this._handleModelEvent.bind(this);
-    this._handleFilterTypeChange = this._handleFilterTypeChange.bind(this);
+    this.handleFilterTypeChange = this.handleFilterTypeChange.bind(this);
 
     this._filmsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
@@ -23,7 +24,9 @@ export default class Filter {
     const prevFilterComponent = this._filterComponent;
 
     this._filterComponent = new FilterView(filters, this._filterModel.getFilter());
-    this._filterComponent.setFilterTypeChangeHandler(this._handleFilterTypeChange);
+    this._filterComponent.setFilterTypeChangeHandler(this.handleFilterTypeChange);
+    // this.handleSiteMenuClick = this.handleSiteMenuClick.bind(this);
+    // this._filterComponent.setMenuClickHandler(this.handleSiteMenuClick);
 
     if (prevFilterComponent === null) {
       render(this._filterContainer, this._filterComponent, RenderPosition.BEFOREEND);
@@ -38,7 +41,16 @@ export default class Filter {
     this.init();
   }
 
-  _handleFilterTypeChange(filterType) {
+  handleFilterTypeChange(filterType) {
+    if(boardPresenter._boardComponent._element === null) {
+      remove(filmStatisticsViewComponent);
+
+      this._filterModel.setFilter(UpdateType.MAJOR, filterType);
+      boardPresenter.init();
+      // let filmStatisticsViewComponent = null;
+      siteMenuElement.addEventListener('click', handleSiteMenuClick);
+    }
+
     if (this._filterModel.getFilter() === filterType) {
       return;
     }

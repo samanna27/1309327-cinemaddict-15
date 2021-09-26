@@ -43,21 +43,33 @@ export default class Board {
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleShowMoreButtonClick = this._handleShowMoreButtonClick.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
-
-    this._filmsModel.addObserver(this._handleModelEvent);
-    this._filterModel.addObserver(this._handleModelEvent);
-    this._commentsModel.addObserver(this._handleModelEvent);
   }
 
   init() {
-    // this._boardFilms = boardFilms.slice();
-    // this._sourcedBoardFilms = boardFilms.slice();
-
     render(this._boardContainer, this._boardComponent, RenderPosition.BEFOREEND);
     render(this._boardComponent, this._filmsContainerComponent, RenderPosition.BEFOREEND);
     render(this._filmsContainerComponent, this._filmsListComponent, RenderPosition.BEFOREEND);
 
+    this._filmsModel.addObserver(this._handleModelEvent);
+    this._filterModel.addObserver(this._handleModelEvent);
+    this._commentsModel.addObserver(this._handleModelEvent);
+
     this._renderBoard();
+  }
+
+  destroy() {
+    this._clearBoard({resetRenderedFilmCount: true, resetSortType: true});
+
+    remove(this._filmsListComponent);
+    remove(this._filmsContainerComponent);
+    remove(this._boardComponent);
+    remove(this._topFilmsListComponent);
+    remove(this._mostCommentedFilmsListComponent);
+    // this._topFilmsComponent = new TopFilmsView();
+    // this._mostCommentedFilmsComponent = new MostCommentedFilmsView();
+
+    this._filmsModel.removeObserver(this._handleModelEvent);
+    this._filterModel.removeObserver(this._handleModelEvent);
   }
 
   _getFilms() {

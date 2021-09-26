@@ -42,3 +42,6 @@ export const sortFilmRatingDown = (filmA, filmB) => {
 
   return (filmB.rating-filmA.rating);
 };
+
+export const isDatesEqual = (dateA, dateB) =>
+  (dateA === null && dateB === null) ? true : dayjs(dateA).isSame(dateB, 'D');

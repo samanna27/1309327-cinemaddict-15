@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import {nanoid} from 'nanoid';
 import { getRandomInteger } from '../utils/common.js';
-import { COMMENTS_QUANTITY, COMMENTS_IN_FILM } from '../const.js';
+import { COMMENTS_QUANTITY, COMMENTS_IN_FILM, GENRES as genres } from '../const.js';
 
 const SENTENCE_COUNT = 5;
 const RATING_MIN=0;
@@ -62,15 +62,6 @@ const getRandomArrayElements = (elements, count) => {
 
 export const commentsIds = new Array(COMMENTS_QUANTITY).fill().map(nanoid);
 
-const genres = [
-  'Comedy',
-  'Drama',
-  'Western',
-  'Musical',
-  'Cartoon',
-  'Mystery',
-];
-
 const generateDescription = () => {
   const fullDescription = getRandomArrayElements(descriptions, getRandomInteger(0, SENTENCE_COUNT)).join('');
   const descriptionLength = fullDescription.length;
@@ -101,7 +92,7 @@ const countries = [
 ];
 
 const generateDate = () => {
-  const maxYearsGap = 120;
+  const maxYearsGap = 1;
   const yearsGap = getRandomInteger(-maxYearsGap, 0);
   return dayjs().add(yearsGap, 'year').toDate();
 };
@@ -129,5 +120,6 @@ export const generateFilm = () => {
     isAddedToWatchlist: Boolean(getRandomInteger(0, 1)),
     isAlreadyWatched: Boolean(getRandomInteger(0, 1)),
     isFavorite: Boolean(getRandomInteger(0, 1)),
+    watchedDate: dayjs(date).format('D MMMM YYYY'),
   };
 };

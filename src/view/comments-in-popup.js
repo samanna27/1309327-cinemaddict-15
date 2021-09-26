@@ -42,7 +42,7 @@ const createCommentTemplate = (comments, commentsIdsInFilm) => {
         </div>
 
           <label class="film-details__comment-label">
-          <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${he.encode()}
+          <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">
           </textarea>
           </label>
 
